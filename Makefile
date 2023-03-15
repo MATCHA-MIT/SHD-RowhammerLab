@@ -1,6 +1,6 @@
 CC=g++
 
-all: bin/part0 bin/part1 bin/part2_1 bin/part2_2 bin/part3
+all: bin/part0 bin/part1 bin/part2_1 bin/part2_2 bin/part3 bin/part4
 clean:
 	rm -f bin/part0
 	rm -f bin/part1
