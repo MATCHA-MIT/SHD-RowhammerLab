@@ -16,7 +16,7 @@
 bool hammer_addresses(uint64_t vict_phys_addr, uint64_t attacker_phys_addr_1, uint64_t attacker_phys_addr_2) {
   bool foundFlip = false; 
 
-  //TODO: Part 1.2
+  //TODO: Exercise 2-1
 
   return foundFlip; 
 }

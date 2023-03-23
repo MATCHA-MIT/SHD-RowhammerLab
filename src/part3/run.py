@@ -4,7 +4,7 @@ import subprocess
 import csv
 
 # Change this line if you want to use the reference implementation!
-executable_filename = './part2_1'
+executable_filename = './part3_1'
 num_runs = 100
 
 graph_repo = "data"
