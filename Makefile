@@ -15,7 +15,7 @@ bin/part0: src/part0/part0.cc
 bin/part1: src/part1/part1.cc src/part1/part1.hh src/verif.hh src/shared.cc src/shared.hh src/params.hh
 	$(CC) -std=c++11 -o $@ src/part1/part1.cc src/shared.cc bin/verif.o
 
-bin/part2: src/part2/part2.cc src/part2/part2.hh src/verif.hh src/shared.cc src/shared.hh src/params.hh
+bin/part2: src/part2/part2.cc src/part2/part2.hh src/verif.hh src/shared.cc src/shared.hh src/params.hh src/part2/hammertime.cc
 	$(CC) -std=c++11 -o $@ src/part2/part2.cc src/part2/hammertime.cc src/shared.cc bin/verif.o
 
 bin/part3_1: src/part3/part3_1.cc src/util.hh src/verif.hh src/shared.cc src/shared.hh src/params.hh
