@@ -78,7 +78,7 @@ uint64_t virt_to_phys(uint64_t virt_addr) {
         if (entry & (1ULL << 63)) { 
           uint64_t phys_page_number = entry & ((1ULL << 54) - 1);
           // TODO: Exercise 1-1
-          // Using the extracted physical page number, derive the virtual address
+          // Using the extracted physical page number, derive the physical address
           phys_addr = 0;
         } 
       }
