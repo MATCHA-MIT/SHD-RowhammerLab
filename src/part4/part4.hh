@@ -88,7 +88,7 @@ inline uint32_t injectRandomFlips(uint32_t data, uint8_t numFlips) {
     uint32_t faulty = data;
     std::vector<uint8_t> indices;
 
-    for (int i = 0; i < TOTAL_BITS; i++) {
+    for (int i = 0; i < TOTAL_BITS-1; i++) {
         indices.push_back(i);
     }
 
