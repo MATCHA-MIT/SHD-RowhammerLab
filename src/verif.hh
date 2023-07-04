@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <unistd.h>
 
-// Part A Verification
-void verify_PPN_VPN_map(void * mem_map, std::map<uint64_t, uint64_t> PPN_VPN_map);
+#include <inttypes.h>
+#include <stdlib.h>
 
+
+void verify_virt_to_phys(void * mem_map, uint64_t (*fun)(uint64_t));
+void verify_PPN_VPN_map(void * mem_map, std::map<uint64_t, uint64_t> PPN_VPN_map);
