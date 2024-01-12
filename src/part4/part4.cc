@@ -63,107 +63,104 @@ int main(void) {
     /* -------- Setup Phase -------- */
 
     // Generate Random Data
-    srand (time(NULL));
-    uint32_t data = rand() % (1 << NUM_DATA_BITS);
-    printf("Random Data Generated: %x\n", data);
-
-    // Generate Data Parity
-    uint32_t parity = genParity(data);                  //TODO: Finish genParity!
-    printf("Parity of Generated Data: %x\n", parity);
-
-    // Encode into bitstream
-    uint32_t encoded = embedEncoding({data, parity});
-    printf("Embedded Encoding: %x\n", encoded);
-
-    // Check result against gold solution
-    if(!checkParity(encoded)) {
-        printf("FAIL: Not quite! Your parity value is incorrect.\n");
-        return -1;
-    } else {
-        printf("PASS: Your parity value is correct\n");
-    }
-
-    /* -------- Verify No Error Case --------- */
-
+    int numTests = 4;
     int pass = 1;
+    for (int testIter = 0; testIter < numTests; testIter++) {
+      printf("=== Test Iteration %d / %d ===\n", testIter+1, numTests);
 
-    // Verify that no errors occur upon 0 bit flips
-    printf("\nVerifying (no flips)...\n");
-    if (findHammingErrors(encoded).error != NO_ERROR) {
-        printf("FAIL: Error detected when there wasn't one!\n");
-        pass = 0;
-    } else if (encoded != verifyAndRepair(encoded)) {               // TODO: finish verifyAndRepair!
-        printf("FAIL: verifyAndRepair changed a valid encoding!\n");
-        pass = 0;
-    } else {
-        printf("PASS\n");
-    }
-    
-    /* -------- Verify One Error Case --------- */
+      srand (time(NULL));
+      uint32_t data = rand() % (1 << NUM_DATA_BITS);
+      printf("Random Data Generated: %x\n", data);
 
-    printf("\nVerifying (one flip)...\n");
+      // Generate Data Parity
+      uint32_t parity = genParity(data);                  //TODO: Finish genParity!
+      printf("Parity of Generated Data: %x\n", parity);
 
-    // Inject errors into encoding    
-    uint32_t encoded_oneflip = injectRandomFlips(encoded,1);
-    printf("Data after one bit flip: %x\n", encoded_oneflip);
+      // Encode into bitstream
+      uint32_t encoded = embedEncoding({data, parity});
+      printf("Embedded Encoding: %x\n", encoded);
 
-    // Verify 1 bit flip case    
-    uint32_t repaired = verifyAndRepair(encoded_oneflip);
-    printf("Repaired Encoding: %x\n", repaired);
+      // Check result against gold solution
+      if(!checkParity(encoded)) {
+          printf("FAIL: Not quite! Your parity value is incorrect.\n");
+          return -1;
+      } 
 
-    if (findHammingErrors(encoded_oneflip).error != SINGLE_ERROR) {
-        printf("FAIL: Single error not detected!\n");
-        pass = 0;
-    } else if (encoded != verifyAndRepair(encoded_oneflip)) {
-        printf("FAIL: verifyAndRepair failed to correct value!\n");
-        pass = 0;
-    } else {
-        printf("PASS\n");
-    }
-        
-    /* -------- Verify Parity Error Case --------- */
-    
-    printf("\nVerifying (parity flip)...\n");
-    
-    // Inject errors into encoding    
-    uint32_t encoded_parityflip = flipBit(encoded,TOTAL_BITS-1);
-    printf("Data after parity bit flip: %x\n", encoded_parityflip);
+      /* -------- Verify No Error Case --------- */
 
-    // Verify 1 bit flip case    
-    repaired = verifyAndRepair(encoded_parityflip);
-    printf("Repaired Encoding: %x\n", repaired);
-    
-    if (findHammingErrors(encoded_parityflip).error != PARITY_ERROR) {
-        printf("FAIL: Parity error not detected!\n");
-        pass = 0;
-    } else if (encoded != verifyAndRepair(encoded_parityflip)) {
-        printf("FAIL: verifyAndRepair failed to correct value!\n");
-        pass = 0;
-    } else {
-        printf("PASS\n");
-    }
-    
-    /* -------- Verify Double Error Case --------- */
-    
-    printf("\nVerifying (double flip)...\n");
-    
-    // Inject 2 errors into encoding
-    uint32_t encoded_twoflip = injectRandomFlips(encoded,2);
-    printf("Two bit flip: %x\n", encoded_twoflip);
 
-    if (findHammingErrors(encoded_twoflip).error != DOUBLE_ERROR) {
-        printf("FAIL: Parity error not detected!\n");
-        pass = 0;
-    } else {
-        printf("PASS\n");
-    }
-    
+      // Verify that no errors occur upon 0 bit flips
+      printf("\nVerifying (no flips)...\n");
+      if (findHammingErrors(encoded).error != NO_ERROR) {
+          printf("FAIL: Error detected when there wasn't one!\n");
+          pass = 0;
+      } else if (encoded != verifyAndRepair(encoded)) {               // TODO: finish verifyAndRepair!
+          printf("FAIL: verifyAndRepair changed a valid encoding!\n");
+          pass = 0;
+      } 
+      
+      /* -------- Verify One Error Case --------- */
+
+      printf("\nVerifying (one flip)...\n");
+
+      // Inject errors into encoding    
+      uint32_t encoded_oneflip = injectRandomFlips(encoded,1);
+      printf("Data after one bit flip: %x\n", encoded_oneflip);
+
+      // Verify 1 bit flip case    
+      uint32_t repaired = verifyAndRepair(encoded_oneflip);
+      printf("Repaired Encoding: %x\n", repaired);
+
+      if (findHammingErrors(encoded_oneflip).error != SINGLE_ERROR) {
+          printf("FAIL: Single error not detected!\n");
+          pass = 0;
+      } else if (encoded != verifyAndRepair(encoded_oneflip)) {
+          printf("FAIL: verifyAndRepair failed to correct value!\n");
+          pass = 0;
+      }
+          
+      /* -------- Verify Parity Error Case --------- */
+      
+      printf("\nVerifying (parity flip)...\n");
+      
+      // Inject errors into encoding    
+      uint32_t encoded_parityflip = flipBit(encoded,TOTAL_BITS-1);
+      printf("Data after parity bit flip: %x\n", encoded_parityflip);
+
+      // Verify 1 bit flip case    
+      repaired = verifyAndRepair(encoded_parityflip);
+      printf("Repaired Encoding: %x\n", repaired);
+      
+      if (findHammingErrors(encoded_parityflip).error != PARITY_ERROR) {
+          printf("FAIL: Parity error not detected!\n");
+          pass = 0;
+      } else if (encoded != verifyAndRepair(encoded_parityflip)) {
+          printf("FAIL: verifyAndRepair failed to correct value!\n");
+          pass = 0;
+      } 
+      
+      /* -------- Verify Double Error Case --------- */
+      
+      printf("\nVerifying (double flip)...\n");
+      
+      // Inject 2 errors into encoding
+      uint32_t encoded_twoflip = injectRandomFlips(encoded,2);
+      printf("Two bit flip: %x\n", encoded_twoflip);
+
+      if (findHammingErrors(encoded_twoflip).error != DOUBLE_ERROR) {
+          printf("FAIL: Parity error not detected!\n");
+          pass = 0;
+      } 
+
+      if (!pass) {
+        printf("\n One or more tests failed.");
+        break;
+      }
+    } 
     /* -------- Finish --------- */
 
     if(pass) {
-        printf("\nALL TESTS PASSED!\n");
-    } else {
-        printf("\nOne or more tests failed.\n");
+        printf("\n*** All tests passed, congratulations! ***\n");
     }
 
 }
