@@ -1,7 +1,24 @@
 #include "../shared.hh"
 #include "../params.hh"
+#include "../util.hh"
 
 #define SAMPLES 10
+
+/*
+ * measure_bank_latency
+ *
+ * Measures a (potential) bank collision between two addresses,
+ * and returns its timing characteristics.
+ *
+ * Inputs: addr_A/addr_B - Two (virtual) addresses used to observe
+ *                         potential contention
+ * Output: Timing difference (derived by a scheme of your choice)
+ *
+ */
+uint64_t measure_bank_latency(uint64_t addr_A, uint64_t addr_B) {
+  // TODO: Exercise 3-1
+  return 0;
+}
 
 /*
  *
@@ -50,8 +67,8 @@ int main (int ac, char **av) {
   for (int i = 0; i < SAMPLES; i++) 
     diff_bank_latency[i] = measure_bank_latency(addr_A_ptr, addr_C_ptr);
 
-  //print_results(same_bank_latency, diff_bank_latency); 
-  print_to_json(same_bank_latency, diff_bank_latency);
+  print_results(same_bank_latency, diff_bank_latency); 
+  //print_to_json(same_bank_latency, diff_bank_latency);
 
   return 0;
 }

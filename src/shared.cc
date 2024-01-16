@@ -107,19 +107,4 @@ uint64_t phys_to_virt(uint64_t phys_addr) {
   return 0;
 }
 
-/*
- * measure_bank_latency
- *
- * Measures a (potential) bank collision between two addresses,
- * and returns its timing characteristics.
- *
- * Inputs: addr_A/addr_B - Two (virtual) addresses used to observe
- *                         potential contention
- * Output: Timing difference (derived by a scheme of your choice)
- *
- */
-uint64_t measure_bank_latency(uint64_t addr_A, uint64_t addr_B) {
-  // TODO: Exercise 3-1
-  return 0;
-}
 

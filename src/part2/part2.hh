@@ -1,6 +1,7 @@
 #include "../shared.hh"
 #include "../verif.hh"
 #include "../params.hh"
+#include "../util.hh"
 
 // TODO: Part 1.2
 // Replace these with your machine-specific addresses!
