@@ -33,15 +33,15 @@ void * allocate_pages(uint64_t memory_size);
 
 // Staff Provided Helper Functions
 inline uint64_t get_time() {
-	uint64_t cycles;
-	asm volatile("rdtscp\n\t"
-				 "shl $32, %%rdx\n\t"
-				 "or %%rdx, %0\n\t"
-				 : "=a"(cycles)
-				 :
-				 : "rcx", "rdx", "memory");
+    uint64_t cycles;
+    asm volatile("rdtscp\n\t"
+                 "shl $32, %%rdx\n\t"
+                 "or %%rdx, %0\n\t"
+                 : "=a"(cycles)
+                 :
+                 : "rcx", "rdx", "memory");
 
-	return cycles;
+    return cycles;
 }
 
 #endif

@@ -17,15 +17,15 @@
 // "rdtscp64" return a 64 bit unsigned integer
 // Details in https://www.felixcloutier.com/x86/rdtscp
 static inline uint32_t rdtscp() {
-  uint32_t rv;
-  asm volatile ("rdtscp": "=a" (rv) :: "edx", "ecx");
-  return rv;
+    uint32_t rv;
+    asm volatile ("rdtscp": "=a" (rv) :: "edx", "ecx");
+    return rv;
 }
 
 static inline uint64_t rdtscp64() {
-  uint32_t low, high;
-  asm volatile ("rdtscp": "=a" (low), "=d" (high) :: "ecx");
-  return (((uint64_t)high) << 32) | low;
+    uint32_t low, high;
+    asm volatile ("rdtscp": "=a" (low), "=d" (high) :: "ecx");
+    return (((uint64_t)high) << 32) | low;
 }
 
 // Function "lfence" wrap the assembly instruction lfence
@@ -34,7 +34,7 @@ static inline uint64_t rdtscp64() {
 // all the instructions before "lfence" complete
 // Details in https://www.felixcloutier.com/x86/lfence
 static inline void lfence() {
-  asm volatile("lfence");
+    asm volatile("lfence");
 }
 
 // Here is an example of using "rdtsc" and "lfence" to
@@ -49,30 +49,30 @@ static inline void lfence() {
 // =========
 static inline uint64_t measure_one_block_access_time(uint64_t addr)
 {
-	uint64_t cycles;
+    uint64_t cycles;
 
-	asm volatile("mov %1, %%r8\n\t"
-	"lfence\n\t"
-	"rdtsc\n\t"
-	"mov %%eax, %%edi\n\t"
-	"mov (%%r8), %%r8\n\t"
-	"lfence\n\t"
-	"rdtsc\n\t"
-	"sub %%edi, %%eax\n\t"
-	: "=a"(cycles) /*output*/
-	: "r"(addr)    /*input*/
-	: "r8", "edi");	/*reserved register*/
+    asm volatile("mov %1, %%r8\n\t"
+    "lfence\n\t"
+    "rdtsc\n\t"
+    "mov %%eax, %%edi\n\t"
+    "mov (%%r8), %%r8\n\t"
+    "lfence\n\t"
+    "rdtsc\n\t"
+    "sub %%edi, %%eax\n\t"
+    : "=a"(cycles) /*output*/
+    : "r"(addr)    /*input*/
+    : "r8", "edi"); /*reserved register*/
 
-	return cycles;
+    return cycles;
 }
 
 
 static inline void one_block_access(uint64_t addr)
 {
-	asm volatile("mov (%0), %%r8\n\t"
-	: /*output*/
-	: "r"(addr)    /*input*/
-	: "r8");	/*reserved register*/
+    asm volatile("mov (%0), %%r8\n\t"
+    : /*output*/
+    : "r"(addr)    /*input*/
+    : "r8");    /*reserved register*/
 
 }
 
@@ -81,8 +81,9 @@ static inline void one_block_access(uint64_t addr)
 // The instruction evict the given address from the cache to DRAM
 // so that the next time the line is accessed, it will be fetched from DRAM
 // Details in https://www.felixcloutier.com/x86/clflush
+// The "memory" at the end of the line ask compiler not reorder memory loads
 static inline void clflush(void *v) {
-  asm volatile ("clflush 0(%0)": : "r" (v):);
+    asm volatile ("clflush (%0)": : "r" (v) : "memory");
 }
 
 #endif // _UTILITY_H__ 

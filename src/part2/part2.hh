@@ -3,15 +3,12 @@
 #include "../params.hh"
 #include "../util.hh"
 
-// TODO: Part 1.2
-// Replace these with your machine-specific addresses!
+// Physical Addresses for Specific DRAM Rows
+#define VICT_ADDR 0x75380000UL
+#define ADDR_A    0x753A2000UL
+#define ADDR_B    0x7536E000UL
+#define ADDR_C    0x75308000UL
+#define ADDR_D    0x75382000UL
 
-#define VICT_ADDR 0x75369000UL
-
-#define ADDR_A 0x75387000UL
-#define ADDR_B 0x7534B000UL
-#define ADDR_C 0x7532D000UL
-#define ADDR_D 0x75369100UL
-// END TODO
-
-bool hammer_addresses(uint64_t vict_phys_addr, uint64_t attacker_phys_addr_1, uint64_t attacker_phys_addr_2);
+bool hammer_addresses(uint64_t vict_phys_addr, uint64_t attacker_phys_addr_1,
+                      uint64_t attacker_phys_addr_2);
