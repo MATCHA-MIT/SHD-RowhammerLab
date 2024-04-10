@@ -38,7 +38,7 @@ static int __kprobes target_pre(struct kprobe *p, struct pt_regs *regs) { return
 
 static void __kprobes target_post(struct kprobe *p, struct pt_regs *regs, unsigned long flags) 
 {
-    pr_info("bypassing CAP_SYS_ADMIN check for pagemap_read");
+    // pr_info("bypassing CAP_SYS_ADMIN check for pagemap_read");
     regs->ax = 1;
 }
 
