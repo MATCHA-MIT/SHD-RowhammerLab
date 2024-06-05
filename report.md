@@ -19,9 +19,9 @@
 
 ## 3-1
 
-**Given a victim address 0x752C3000, what is the value of its Row id? The value of its Column id?**
+**Given a victim address `0x752C3000`, what is the value of its \<Row id\>? The value of its \<Column id\>?**
 
-**For the same address, assume an arbitrary XOR function for computing the Bank id, list all possible attacker addresses whose Row id is one more than 0x752C3000's Row id and all the other ids match, including the Bank id and Column id. Hint: there should be 16 such addresses total.**
+**For this same victim address, when the exact XOR function being used for computing the \<Bank id\> is unknown, list all possible attacker addresses that stays in the row below the victim address (i.e., the attacker's \<Row id\> is 1 more than the victim's) while sharing the same \<Column id\> and \<Bank id\> Hint: there should be 16 such addresses total.**
 
 
 ## 3-2
@@ -51,20 +51,21 @@ jmp loop
 
 ## 4-1
 
-**Given the ECC type descriptions listed above, fill in the following table (assuming a data length of 4). For correction/detection, only answer "Yes" if it can always correct/detect (and "No" if there is ever a case where the scheme can fail to correct/detect). We've filled in the first line for you.**
 
-| ECC Type              | Code Rate | Single Error Detection | Single Error Correction | Double Error Detection | Double Error Correction | Triple Error Detection |
-| --------------------- | --- | - | - | - | - | - |
-| 1-Repetition (No ECC) | 1.0 | N | N | N | N | N |
-| 2-Repetition          |     |   |   |   |   |   |
-| 3-Repetition          |     |   |   |   |   |   |
-| Single Parity Bit     |     |   |   |   |   |   |
-| Hamming(7,4)          |     |   |   |   |   |   |
+**Given the ECC type descriptions listed above, fill in the following table (assuming a data length of 4).**
+
+
+|   | 1-Repetition (No ECC) | 2-Repetition | 3-Repetition | Single Parity Bit | Hamming(7,4) |
+| - | --------------------- | ------------ | ------------ | ----------------- | ------------ |
+| **Code Rate (Data Bits / Total Bits)** | 1.0 | | | | |
+| **Max Number of Errors Can Detect**    |   1 | | | | |
+| **Max Number of Errors Can Correct**   |   0 | | | | |
+
 
 
 ## 4-3
 
-**When a single bit flip is detected, describe how Hamming(22,16) can correct this error.**
+**When a single bit flip is detected, describe what action should be conducted to correct this error with Hamming(22,16).**
 
 
 ## 4-5
