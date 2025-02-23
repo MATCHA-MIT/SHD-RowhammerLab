@@ -9,6 +9,6 @@ fi
 rm -f log/${1}.log log/${1}.error log/${1}.out
 
 condor_submit log=log/${1}.log error=log/${1}.error output=log/${1}.out \
-              executable=bin/${1} launch.condor
+              transfer_input_files=bin/libverif.so executable=bin/${1} launch.condor
 
 condor_wait log/${1}.log

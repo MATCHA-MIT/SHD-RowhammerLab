@@ -1,5 +1,5 @@
-#ifndef SHARED_GUARD
-#define SHARED_GUARD
+#ifndef SHARED_HH
+#define SHARED_HH
 
 #include <fcntl.h>
 #include <inttypes.h>
@@ -10,11 +10,12 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <unistd.h>
-#include <vector>
-#include <unistd.h>
+
 #include <vector>
 #include <cstdint>
+
+#include <unistd.h>
+#include <unistd.h>
 #include <emmintrin.h>
 
 // Physical Page Number to Virtual Page Number Map
@@ -27,6 +28,7 @@ extern void * allocated_mem;
 uint64_t virt_to_phys(uint64_t virt_addr);
 uint64_t phys_to_virt(uint64_t phys_addr);
 void setup_PPN_VPN_map(void * mem_map, std::map<uint64_t, uint64_t> &PPN_VPN_map);
+uint64_t measure_bank_latency(uint64_t addr_A, uint64_t addr_B);
 
 // Helper Functions
 void * allocate_pages(uint64_t memory_size);

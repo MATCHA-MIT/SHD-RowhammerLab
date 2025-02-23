@@ -1,4 +1,6 @@
-#include "part1.hh"
+#include "../shared.hh"
+#include "../verif.hh"
+#include "../params.hh"
 
 /*
  *

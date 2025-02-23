@@ -1,3 +1,6 @@
+#ifndef UTIL_HH
+#define UTIL_HH
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,9 +8,6 @@
 #include <unistd.h>
 #include <signal.h>
 #include <assert.h>
-
-#ifndef __UTILITY_H__
-#define __UTILITY_H__
 
 #define SAMPLES 10
 
@@ -86,5 +86,5 @@ static inline void clflush(void *v) {
     asm volatile ("clflush (%0)": : "r" (v) : "memory");
 }
 
-#endif // _UTILITY_H__ 
+#endif
 

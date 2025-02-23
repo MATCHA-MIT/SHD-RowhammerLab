@@ -10,7 +10,7 @@ should_transfer_files = YES
 ###########################################
 ## Fill in your assigned machine ##########
 ## do NOT include .csail.mit.edu suffix ###
-Requirements = (machine == "arch-sec-X")
+Requirements = (machine == "csg-exp7")
 ###########################################
 
 ## DO NOT MODIFY BELOW ME ##

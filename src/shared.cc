@@ -1,7 +1,8 @@
+#include <emmintrin.h>
+
 #include "shared.hh"
 #include "params.hh"
 #include "util.hh"
-#include <emmintrin.h>
 
 // Physical Page Number to Virtual Page Number Map
 std::map<uint64_t, uint64_t> PPN_VPN_map;
@@ -41,14 +42,14 @@ void setup_PPN_VPN_map(void * mem_map,
 void * allocate_pages(uint64_t memory_size) {
     void * memory_block = mmap(NULL, memory_size, PROT_READ | PROT_WRITE,
             MAP_POPULATE | MAP_ANONYMOUS | MAP_PRIVATE | MAP_HUGETLB, -1, 0);
-    assert(memory_block != (void*) - 1);
+    assert(memory_block != (void*)-1);
 
     for (uint64_t i = 0; i < memory_size; i += HUGE_PAGE_SIZE) {
         uint64_t * addr = (uint64_t *) ((uint8_t *) (memory_block) + i);
         *addr = i;
     } 
 
-    return memory_block;  
+    return memory_block;
 }
 
 /* 
@@ -62,6 +63,7 @@ void * allocate_pages(uint64_t memory_size) {
  *                               present, return 0
  *
  */
+
 
 uint64_t virt_to_phys(uint64_t virt_addr) {
     uint64_t phys_addr;
@@ -107,6 +109,23 @@ uint64_t virt_to_phys(uint64_t virt_addr) {
 
 uint64_t phys_to_virt(uint64_t phys_addr) {
     // TODO: Exercise 1-4
+    return 0;
+}
+
+/*
+ * measure_bank_latency
+ *
+ * Measures a (potential) bank collision between two addresses,
+ * and returns its timing characteristics.
+ *
+ * Inputs: addr_A/addr_B - Two (virtual) addresses used to observe
+ *                         potential contention
+ * Output: Timing difference (derived by a scheme of your choice)
+ *
+ */
+uint64_t measure_bank_latency(uint64_t addr_A, uint64_t addr_B) {
+    // TODO: Exercise 2-2
+    
     return 0;
 }
 

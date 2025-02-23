@@ -1,5 +1,5 @@
-#ifndef PARAMS_GUARD
-#define PARAMS_GUARD
+#ifndef PARAMS_HH
+#define PARAMS_HH
 
 // Size of allocated buffer
 #define BUFFER_SIZE_MB 2048

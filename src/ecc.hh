@@ -1,5 +1,5 @@
-#ifndef HAMMING_GUARD
-#define HAMMING_GUARD
+#ifndef ECC_HH
+#define ECC_HH
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -101,8 +101,5 @@ inline uint32_t injectRandomFlips(uint32_t data, uint8_t numFlips) {
 
     return faulty; 
 }
-
-// Included in gold file
-int checkParity(uint32_t encoded);
 
 #endif

@@ -1,24 +1,31 @@
+#include <algorithm>
+#include <array>
+#include <tuple>
+#include <ranges>
+#include <numeric>
+
 #include "../shared.hh"
 #include "../params.hh"
 #include "../util.hh"
 
-#define SAMPLES 10
+#define BANKS 16
+#define THRESHOLD 1000
+#define CONSISTENCY_RATE 0.90
 
 /*
- * measure_bank_latency
+ * bin_rows
  *
- * Measures a (potential) bank collision between two addresses,
- * and returns its timing characteristics.
+ * Bins a selection of addresses in the range of [starting_addr, final_addr)
+ * based on measure_bank_latency.
  *
- * Inputs: addr_A/addr_B - Two (virtual) addresses used to observe
- *                         potential contention
- * Output: Timing difference (derived by a scheme of your choice)
+ * Input: starting and ending addresses
+ * Output: An array of 16 vectors, each of which holds addresses that share the same bank
  *
  */
-uint64_t measure_bank_latency(uint64_t addr_A, uint64_t addr_B) {
-    // TODO: Exercise 3-4
-    
-    return 0;
+std::array<std::vector<uint64_t>, BANKS> bin_rows(uint64_t starting_addr, uint64_t final_addr) {
+    // TODO - Exercise 3-1
+    std::array<std::vector<uint64_t>, BANKS> bins;
+    return bins;
 }
 
 /*
@@ -27,8 +34,78 @@ uint64_t measure_bank_latency(uint64_t addr_A, uint64_t addr_B) {
  *
  */
 
-void print_results(uint64_t* same, uint64_t* diff);
-void print_to_json(uint64_t* same, uint64_t* diff);
+std::tuple<uint64_t, double> get_most_frequent(const std::vector<uint64_t>& data) {
+    std::map<uint64_t, uint64_t> freq_map;
+
+    for (const auto& item : data) {
+        freq_map[item]++;
+    }
+
+    auto [most_freq, max_count] = std::accumulate(
+        freq_map.begin(),
+        freq_map.end(),
+        std::pair<uint64_t, uint64_t>{0, 0},
+        [](const auto& best, const auto& current) {
+            return current.second > best.second ? 
+                std::pair{current.first, current.second} : best;
+        }
+    );
+
+    return {most_freq, static_cast<double>(max_count) / data.size()};
+}
+
+inline uint64_t get_bit(uint64_t x, int bit) {
+    return (x >> bit) & 1;
+}
+
+template <size_t LEN>
+std::optional<uint64_t> find_candidate_function(const std::array<std::vector<uint64_t>, LEN>& bins) {
+    std::optional<uint64_t> result = std::nullopt;
+
+    std::array<std::function<uint64_t(uint64_t)>, 3> functions = {
+        [](uint64_t x) {
+            return ((get_bit(x, 16) ^ get_bit(x, 18)) << 3) | 
+                   ((get_bit(x, 13) ^ get_bit(x, 19)) << 2) | 
+                   ((get_bit(x, 15) ^ get_bit(x, 18)) << 1) |
+                   (get_bit(x, 14) ^ get_bit(x, 20));
+        },
+        [](uint64_t x) {
+            return ((get_bit(x, 15) ^ get_bit(x, 19)) << 3) | 
+                   ((get_bit(x, 14) ^ get_bit(x, 18)) << 2) | 
+                   ((get_bit(x, 13) ^ get_bit(x, 17)) << 1) |
+                   (get_bit(x, 16) ^ get_bit(x, 20));
+        },
+        [](uint64_t x) {
+            return ((get_bit(x, 13) ^ get_bit(x, 18)) << 3) | 
+                   ((get_bit(x, 14) ^ get_bit(x, 17)) << 2) | 
+                   ((get_bit(x, 16) ^ get_bit(x, 19)) << 1) |
+                   (get_bit(x, 15) ^ get_bit(x, 20));
+        },
+    };
+
+    for (size_t i = 0; i < functions.size(); i++) {
+        auto &f = functions[i];
+        bool good = true;
+        for (auto &bin: bins) {
+            uint64_t match_count = 0;
+            std::vector<uint64_t> bank_comp(bin.size());
+            std::transform(bin.begin(), bin.end(), bank_comp.begin(), f);
+            auto [id, freq] = get_most_frequent(bank_comp);
+            if (freq < CONSISTENCY_RATE) {
+                good = false;
+                break;
+            }
+        }
+        if (good) {
+            // conflicting results
+            if (result.has_value())
+                return std::nullopt;
+            result = i;
+        }
+    }
+
+    return result;
+}
 
 int main (int ac, char **av) {
     
@@ -41,68 +118,12 @@ int main (int ac, char **av) {
     // Setup PPN_VPN_map
     setup_PPN_VPN_map(allocated_mem, PPN_VPN_map);
 
-    uint64_t same_bank_latency[SAMPLES] = {0};
-    uint64_t diff_bank_latency[SAMPLES] = {0};
+    auto result = find_candidate_function(
+        bin_rows((uint64_t)allocated_mem, (uint64_t)allocated_mem + ROW_SIZE * 4096));
 
-    // Provided Physical Addresses
-    // You don't need to change these!
-    uint64_t addr_A = 0x7535a000UL;
-    uint64_t addr_B = 0x75396000UL; // Same bank, different row ID as A
-    uint64_t addr_C = 0x75358000UL; // Diff bank, same row ID as A
-     
-    // Determine Mapped Virtual Addresses
-    uint64_t addr_A_ptr = phys_to_virt(addr_A);
-    uint64_t addr_B_ptr = phys_to_virt(addr_B);
-    uint64_t addr_C_ptr = phys_to_virt(addr_C);
-
-    //Calculate bank latencies
-    // First, measure bank latencies for addresses in the same bank 
-    for (int i = 0; i < SAMPLES; i++) 
-        same_bank_latency[i] = measure_bank_latency(addr_A_ptr, addr_B_ptr);
- 
-    // Second, measure bank latencies for addresses in different banks
-    for (int i = 0; i < SAMPLES; i++) 
-        diff_bank_latency[i] = measure_bank_latency(addr_A_ptr, addr_C_ptr);
-
-    print_results(same_bank_latency, diff_bank_latency); 
-    //print_to_json(same_bank_latency, diff_bank_latency);
-
-    return 0;
-}
-
-// Supporting functions for printing results in different formats
-// Function "compare" is used in the priting functions and you do not need it
-int compare(const void *p1, const void *p2) {
-    uint64_t u1 = *(uint64_t *)p1;
-    uint64_t u2 = *(uint64_t *)p2;
-
-    return (int)u1 - (int)u2;
-}
-
-void print_results(uint64_t* same, uint64_t* diff) {
-
-    qsort(same, SAMPLES, sizeof(uint64_t), compare);
-    qsort(diff, SAMPLES, sizeof(uint64_t), compare);
-    printf("             :  Same   Diff   \n");
-    printf("Minimum      : %5ld %5ld\n", same[0], diff[0]);
-    printf("Bottom decile: %5ld %5ld\n", same[SAMPLES/10], diff[SAMPLES/10]);
-    printf("Median       : %5ld %5ld\n", same[SAMPLES/2], diff[SAMPLES/2]);
-    printf("Top decile   : %5ld %5ld\n", same[(SAMPLES * 9)/10],
-                                         diff[(SAMPLES * 9)/10]);
-    printf("Maximum      : %5ld %5ld\n", same[SAMPLES-1], diff[SAMPLES-1]);
-}
-
-void print_to_json(uint64_t* same, uint64_t* diff)
-{
-    qsort(same, SAMPLES, sizeof(uint64_t), compare);
-    qsort(diff,   SAMPLES, sizeof(uint64_t), compare);
-
-    for (int i = 0; i < SAMPLES; i++) {
-        printf("%lu ", same[i]);
+    if (result.has_value()) {
+        printf("Identified function %lu as correct\n", result.value());
+    } else {
+        puts("Did not identify a correct function :(");
     }
-    printf("\n");
-    for (int i = 0; i < SAMPLES; i++) {
-        printf("%lu ", diff[i]);
-    }
-    printf("\n");
 }

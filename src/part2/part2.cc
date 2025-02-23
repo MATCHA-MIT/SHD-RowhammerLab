@@ -1,25 +1,8 @@
-#include "part2.hh"
+#include "../shared.hh"
+#include "../params.hh"
+#include "../util.hh"
 
-/*
- * hammer_addresses
- *
- * Performs a double-sided rowhammer attack on a given victim address,
- * given two aggressor addresses.
- *
- * HINT 1: Be patient! Bit-flips won't happen every time.
- *
- * Input: victim address, and two attacker addresses (all *physical*)
- * Output: True if any bits have been flipped, false otherwise.
- *
- */
-bool hammer_addresses(uint64_t vict_phys_addr, uint64_t attacker_phys_addr_1,
-                      uint64_t attacker_phys_addr_2) {
-    bool foundFlip = false; 
-
-    // TODO: Exercise 2-1
-
-    return foundFlip; 
-}
+#define SAMPLES 10
 
 /*
  *
@@ -27,38 +10,83 @@ bool hammer_addresses(uint64_t vict_phys_addr, uint64_t attacker_phys_addr_1,
  *
  */
 
-#define NUM_ITERATIONS 100
+void print_results(uint64_t* same, uint64_t* diff);
+void print_to_json(uint64_t* same, uint64_t* diff);
 
-int main(int argc, char** argv) {
+int main (int ac, char **av) {
+    
     setvbuf(stdout, NULL, _IONBF, 0);
 
     // Allocate a large pool of memory (of size BUFFER_SIZE_MB) pointed to
     // by allocated_mem
     allocated_mem = allocate_pages(BUFFER_SIZE_MB * 1024UL * 1024UL);
  
-    // Setup, then verify the PPN_VPN_map
+    // Setup PPN_VPN_map
     setup_PPN_VPN_map(allocated_mem, PPN_VPN_map);
-    verify_PPN_VPN_map(allocated_mem, PPN_VPN_map);
 
-    // Now, run all of the experiments!
-    int sum_AB = 0;
-    for(int i = 0; i < NUM_ITERATIONS; i++) {
-        sum_AB += hammer_addresses(VICT_ADDR, ADDR_A, ADDR_B);
+    uint64_t same_bank_latency[SAMPLES] = {0};
+    uint64_t diff_bank_latency[SAMPLES] = {0};
+
+    // Provided Physical Addresses
+    // You don't need to change these!
+    uint64_t addr_A = 0x7535a000UL;
+    uint64_t addr_B = 0x75396000UL; // Same bank, different row ID as A
+    uint64_t addr_C = 0x75358000UL; // Diff bank, same row ID as A
+     
+    // Determine Mapped Virtual Addresses
+    uint64_t addr_A_ptr = phys_to_virt(addr_A);
+    uint64_t addr_B_ptr = phys_to_virt(addr_B);
+    uint64_t addr_C_ptr = phys_to_virt(addr_C);
+
+    //Calculate bank latencies
+    // First, measure bank latencies for addresses in the same bank 
+    for (int i = 0; i < SAMPLES; i++) 
+        same_bank_latency[i] = measure_bank_latency(addr_A_ptr, addr_B_ptr);
+ 
+    // Second, measure bank latencies for addresses in different banks
+    for (int i = 0; i < SAMPLES; i++) 
+        diff_bank_latency[i] = measure_bank_latency(addr_A_ptr, addr_C_ptr);
+
+    print_results(same_bank_latency, diff_bank_latency); 
+    //print_to_json(same_bank_latency, diff_bank_latency);
+
+    return 0;
+}
+
+// Supporting functions for printing results in different formats
+// Function "compare" is used in the priting functions and you do not need it
+int compare(const void *p1, const void *p2) {
+    uint64_t u1 = *(uint64_t *)p1;
+    uint64_t u2 = *(uint64_t *)p2;
+
+    return (int)u1 - (int)u2;
+}
+
+void print_results(uint64_t* same, uint64_t* diff) {
+
+    qsort(same, SAMPLES, sizeof(uint64_t), compare);
+    qsort(diff, SAMPLES, sizeof(uint64_t), compare);
+    printf("             :  Same   Diff   \n");
+    printf("Minimum      : %5ld %5ld\n", same[0], diff[0]);
+    printf("Bottom decile: %5ld %5ld\n", same[SAMPLES/10], diff[SAMPLES/10]);
+    printf("Median       : %5ld %5ld\n", same[SAMPLES/2], diff[SAMPLES/2]);
+    printf("Top decile   : %5ld %5ld\n", same[(SAMPLES * 9)/10],
+                                         diff[(SAMPLES * 9)/10]);
+    printf("Maximum      : %5ld %5ld\n", same[SAMPLES-1], diff[SAMPLES-1]);
+}
+
+void print_to_json(uint64_t* same, uint64_t* diff)
+{
+    qsort(same, SAMPLES, sizeof(uint64_t), compare);
+    qsort(diff,   SAMPLES, sizeof(uint64_t), compare);
+
+    printf("same: ");
+    for (int i = 0; i < SAMPLES; i++) {
+        printf("%lu ", same[i]);
     }
-    printf("Number of bit-flip successes observed out of %d (A/B): %d\n",
-           NUM_ITERATIONS, sum_AB); 
-    
-    int sum_AC = 0;
-    for(int i = 0; i < NUM_ITERATIONS; i++) {
-        sum_AC += hammer_addresses(VICT_ADDR, ADDR_A, ADDR_C);
+    printf("\ndiff: ");
+    for (int i = 0; i < SAMPLES; i++) {
+        printf("%lu ", diff[i]);
     }
-    printf("Number of bit-flip successes observed out of %d (A/C): %d\n",
-           NUM_ITERATIONS, sum_AC); 
-    
-    int sum_AD = 0;
-    for(int i = 0; i < NUM_ITERATIONS; i++) {
-        sum_AD += hammer_addresses(VICT_ADDR, ADDR_A, ADDR_D);
-    }
-    printf("Number of bit-flip successes observed out of %d (A/D): %d\n",
-           NUM_ITERATIONS, sum_AD); 
+    printf("\n");
 }
