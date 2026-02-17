@@ -3,7 +3,7 @@
 #include <tuple>
 #include <ranges>
 #include <numeric>
-
+#include <functional>
 #include "../shared.hh"
 #include "../params.hh"
 #include "../util.hh"
